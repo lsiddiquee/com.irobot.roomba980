@@ -4,8 +4,23 @@
         "en": "Roomba 980"
     },
     "tags": {
-        "en": [ "roomba 980", "vacuum cleaner", "vacuum", "irobot" ],
-        "nl": [ "roomba 980", "stofzuiger", "irobot" ]
+        "en": [
+            "roomba 980",
+            "braava 240",
+            "braava jet 240",
+            "mopping robot",
+            "vacuum cleaner",
+            "vacuum",
+            "irobot"
+        ],
+        "nl": [
+            "roomba 980",
+            "braava 240",
+            "braava jet 240",
+            "dweilrobot",
+            "stofzuiger",
+            "irobot"
+        ]
     },
     "category": "appliances",
     "sdk": 2,
@@ -16,12 +31,42 @@
         "email": "info@athom.com"
     },
     "description": {
-	    "en": "iRobot Roomba 980 support for Homey",
-	    "en": "iRobot Roomba 980 ondersteuning voor Homey"
+        "en": "iRobot Roomba 980 support for Homey",
+        "en": "iRobot Roomba 980 ondersteuning voor Homey"
     },
     "images": {
-	    "large": "/assets/images/large.jpg",
-	    "small": "/assets/images/small.jpg"
+        "large": "/assets/images/large.jpg",
+        "small": "/assets/images/small.jpg"
+    },
+    "capabilities": {
+        "selected_pad": {
+            "type": "enum",
+            "title": {
+                "en": "Selected Pad"
+            },
+            "values": [
+                {
+                    "id": "dry",
+                    "title": {
+                        "en": "Dry Sweeping Pad"
+                    }
+                },
+                {
+                    "id": "damp",
+                    "title": {
+                        "en": "Damp Sweeping Pad"
+                    }
+                },
+                {
+                    "id": "wet",
+                    "title": {
+                        "en": "Wet Mopping Pad"
+                    }
+                }
+            ],
+            "getable": true,
+            "setable": false
+        }
     },
     "drivers": [
         {
@@ -34,10 +79,10 @@
                 "vacuumcleaner_state",
                 "measure_battery"
             ],
-		    "images": {
-			    "large": "/drivers/roomba980/assets/images/large.jpg",
-			    "small": "/drivers/roomba980/assets/images/small.jpg"
-		    },
+            "images": {
+                "large": "/drivers/roomba980/assets/images/large.jpg",
+                "small": "/drivers/roomba980/assets/images/small.jpg"
+            },
             "pair": [
                 {
                     "id": "list_devices",
@@ -51,6 +96,37 @@
                 },
                 {
                     "id": "add_roomba"
+                }
+            ]
+        },
+        {
+            "id": "braava240",
+            "name": {
+                "en": "Braava Jet 240"
+            },
+            "class": "vacuumcleaner",
+            "capabilities": [
+                "vacuumcleaner_state",
+                "selected_pad",
+                "measure_battery"
+            ],
+            "images": {
+                "large": "/drivers/braava240/assets/images/large.jpg",
+                "small": "/drivers/braava240/assets/images/small.jpg"
+            },
+            "pair": [
+                {
+                    "id": "list_devices",
+                    "template": "list_devices",
+                    "navigation": {
+                        "next": "add_braava"
+                    },
+                    "options": {
+                        "singular": true
+                    }
+                },
+                {
+                    "id": "add_braava"
                 }
             ]
         }

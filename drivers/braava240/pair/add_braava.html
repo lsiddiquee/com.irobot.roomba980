@@ -1,0 +1,91 @@
+<style type="text/css">
+.instructions {
+	height: 100%;
+	
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	
+	text-align: center;
+}
+	.instructions img {
+		flex-grow: 1;
+		margin-bottom: 1em;
+		margin: 2em;
+	}
+	.instructions p {
+		flex-shrink: 0;
+		display: none;
+	}
+	
+	.instructions.inuse img,
+	.instructions.inuse p.instruction,
+	.instructions:not(.inuse) p.warning {
+		display: none;
+	}
+	.instructions.inuse p.warning,
+	.instructions:not(.inuse) p.instruction {
+		display: block;
+	}
+</style>
+
+<div class="instructions">
+    <img src="pair_braava.svg">
+    <p class="instruction" data-i18n="pair.add.press_home"></p>
+    <p class="warning" data-i18n="error.in_use"></p>
+</div>
+
+<script>
+    Homey.setTitle(__('pair.add.title'));
+
+    var device = window.selected_devices[0];
+
+    device = JSON.parse(device);
+
+    var interval;
+
+    function check() {
+        Homey.emit('check', {
+            ip: device.ip
+        }, function (err, result) {
+            if (err) return console.error(err);
+
+            if (result.status === 'success') {
+                device.auth.password = result.data;
+
+                // We do not care about the IP address anymore.
+                delete device.ip;
+
+                Homey.addDevice({
+                    data: device,
+                    name: device.name
+                }, function (err, result) {
+                    if (err) return console.error(err);
+
+                    clearInterval(interval);
+                    Homey.done();
+                });
+            }
+            
+            document.querySelector('.instructions').classList.toggle('inuse', result.status === 'in_use');
+            /*
+
+            if (result.status === 'in_use') {
+                // Temporarily display the warning. It doesn't stop the pairing
+                // progress, but asks the user to disconnect while the Homey
+                // tries to connect.
+                warningEl.style.display = 'block';
+                instructionEl.style.display = 'none';
+            } else {
+                warningEl.style.display = 'none';
+                instructionEl.style.display = 'block';
+            }
+            */
+        })
+    }
+
+    interval = setInterval(check, 10 * 1000);
+
+    // Maybe they've already pressed the button.
+    check();
+</script>
