@@ -1,34 +1,19 @@
+const SERVICE_UUID = '5cf821a18df2';
+const SERVICE_MANUFACTURER = '180a';
+
 const Homey = require('homey');
-const bleManager = Homey.wireless('ble');
+const bleManager = Homey.ManagerBLE;
 
 class Braava240Driver extends Homey.Driver {
 
-    // onPair( socket ) {
+	constructor(config) {
+		this.PERIPHERAL_UUID = config.PERIPHERAL_UUID;
+		this.SERVICE_CONTROL = config.SERVICE_CONTROL;
 
-    //     var devices = [
-    //         {
-    //             "name": "My Device",
-    //             "data": { "id": "abcd" }
-    //         }
-    //     ]
-
-    //     socket.on('list_devices', function( data, callback ) {
-
-    //         // emit when devices are still being searched
-    //         socket.emit('list_devices', devices );
-
-    //         // fire the callback when searching is done
-    //         callback( null, devices );    
-
-    //         // when no devices are found, return an empty array
-    //         callback( null, [] );
-
-    //         // or fire a callback with Error to show that instead
-    //         callback( new Error('Something bad has occured!') );        
-
-    //     });
-
-    // }
+		this.devices = new Map();
+		this.state = new Map();
+		this.setColorLock = new Map();
+    }
 
     // alternatively, use the shorthand method
     onPairListDevices(data, callback) {
@@ -40,19 +25,34 @@ class Braava240Driver extends Homey.Driver {
         //         "data": { "id": "abcd" }
         //     }
         // ]
+        
 
         bleManager.discover([], 5000, (err, advertisements) => {
             console.log('DISCOVER', advertisements.length);
-
+            
             advertisements = advertisements || [];
-            advertisements = advertisements.filter(advertisement => !this.getDevice(advertisement.uuid));
+            advertisements = advertisements.filter(advertisement => advertisement.uuid == SERVICE_UUID);
             if (advertisements.length === 0) {
                 return callback(null, []);
             }
             let failedCount = 0;
             advertisements.forEach(advertisement => {
                 console.log('checking advertisement', advertisement.uuid, advertisement.serviceUuids);
-                devices.push({ "name": advertisement.name, "data": { "id": advertisement.uuid } })
+                devices.push({ "name": advertisement.localName, "data": { "id": advertisement.uuid } })
+                console.log('DISCOVER', advertisement.id, advertisement.uuid, advertisement.address, advertisement.addressType, advertisement.connectable, advertisement.localName, advertisement.manufacturerData, advertisement.serviceData, advertisement.serviceUuids, advertisement.rssi);
+                advertisement.printInfo((err, infoString) => {
+                    console.log(infoString)
+                })
+                advertisement.connect((err, peripheral) => {
+                    console.log(peripheral)
+                    peripheral.uuid
+                    peripheral.discoverAllServicesAndCharacteristics((err, services) => {
+                        services.forEach(service => {
+                            console.log(service)
+                        })
+                    })
+                    peripheral.disconnect()
+                })
                 // if (advertisement.serviceUuids.some(uuid => uuid === this.SERVICE_CONTROL)) {
                 //     console.log('connecting to', advertisement);
                 //     advertisement.connect((err, peripheral) => {
@@ -135,10 +135,9 @@ class Braava240Driver extends Homey.Driver {
                 //     callback(null, []);
                 // }
             });
+
+            callback(null, devices);
         });
-
-        callback(null, devices);
-
     }
 
 }
